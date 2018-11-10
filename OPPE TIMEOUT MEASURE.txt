@@ -1,0 +1,82 @@
+-- GE/POP Anesthesia/Surgical Time Out
+
+select
+
+--cast(cb.dateofservice as date) as "Date"
+cbd.doctorname as "Doctor"
+ ,fac.name as "Facility"
+,bsm.billingsystemname as "Billing System"
+
+,sum(case when
+cc.anesthesia_timeout = 'True'
+and cc.emergency  = 'False'
+then 1
+else 0 end) as "Anes Timeout Num"
+
+,sum(case when
+cc.surgery_timeout = 'True'
+and cc.ob_case = 'False'
+and cc.emergency = 'False'
+then 1
+else 0 end) as "Surgical Timeout Num"
+
+,count(case when
+cc.emergency ='False'
+then 1
+else 0 end) as "Anes Cases Den"
+
+-- ,count(cb.encounternumber) as "Anes Case Count"
+
+,count(case when
+cc.emergency = 'False'
+and cc.ob_case  = 'False'
+then 1
+else 0 end) as "Surgical Cases Den"
+
+-- ,count(cb.encounternumber) as "Surgical Case Count"
+
+,(cast(sum(case when
+cc.anesthesia_timeout ='True'
+and cc.emergency ='False'
+then 1.0
+else 0 end  ) /  nullif(count(case when
+cc.emergency ='False'
+then 1
+else 0 end),0) * 100 as decimal(8,2))) as "% Anes Timeout"
+
+													 					 
+,(cast(sum(case when
+cc.surgery_timeout = 'True'
+and cc.emergency = 'False'
+and cc.ob_case = 'False'
+then 1.0
+else 0 end  ) / nullif(count(case when
+cc.emergency = 'False'
+and cc.ob_case  = 'False'
+then 1
+else 0 end),0) * 100 as decimal(8,2))) as "% Surgical Timeout"
+																	 
+
+
+--into table ED1
+											
+from "OPPE".anescompliancebilling as cb
+join "OPPE".anescompliancebillingdetail as cbd
+on cbd.anescompliancebillingid = cb.anescompliancebillingid
+left join "OPPE".anescomplianceclinical cc
+on cb.anescompliancebillingid = cc.anescompliancebillingid
+left join "OPPE".billingsystemmaster bsm
+on cb.billingsystemmasterid = bsm.billingsystemmasterid	
+left join "OPPE".mdm_facility fac
+on cb.facilityid = fac.facilityid
+left join "OPPE".anesabgconfig abg
+on abg.billingsystemmasterid = cb.billingsystemmasterid
+
+where cast(cb.dateofservice as date) >= '20180101' and cast(cb.dateofservice as date) <= '20180630'
+and cb.billingsystemmasterid = '203' 
+--and cb.billingsystemmasterid = '206'
+
+group by cbd.doctorname 
+ ,fac.name 
+,bsm.billingsystemname;
+--,cast(cb.dateofservice as date);

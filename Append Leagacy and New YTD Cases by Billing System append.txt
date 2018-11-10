@@ -1,0 +1,25 @@
+select bsm.billingsystemname, count(distinct ab.encounternumber) as NewCount
+,null as LegacyCount
+
+from "OPPE".anescompliancebilling ab
+left join "OPPE".billingsystemmaster bsm
+on ab.billingsystemmasterid = bsm.billingsystemmasterid
+--full outer join  Legacycount lc
+--on lc.billingsystemmasterid = ab.billingsystemmasterid
+--left join "OPPE".mdm_facility fac
+--on ab.facilityid = fac.facilityid
+where cast(ab.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by  bsm.billingsystemname
+
+union all
+
+select  bsm.billingsystemname,null as NewCount,  count(distinct bml.encounternumber) as LegacyCount
+from "OPPE".billingmasterdataalllegacy bml
+left join "OPPE".billingsystemmaster bsm
+on bml.billingsystemmasterid = bsm.billingsystemmasterid
+where cast(bml.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by bsm.billingsystemname
+
+order by  LegacyCount desc,NewCount desc;

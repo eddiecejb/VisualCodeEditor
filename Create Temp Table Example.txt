@@ -1,0 +1,23 @@
+-- temp table test
+-- Question? Should int and units be text field in temp to 
+-- match data type with other tables except function tables
+Create temporary table temp(
+BillingSystemID int,
+BillingSystemName text,
+Units int
+);
+
+insert into temp(BillingSystemID,BillingSystemName,Units)
+values(1,'EDsBillingSystem',5000),(2,'NAGAsBillingSystem',4000);
+
+select * from temp
+
+
+-----------------------------------------------------------------------------
+
+DROP TABLE IF EXISTS TEMP;
+select cb.encounternumber, acb.doctorname, cc.facilityname
+
+INTO temporary table TEMP
+
+FROM ......

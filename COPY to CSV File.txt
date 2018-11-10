@@ -1,0 +1,17 @@
+-- COPY results to CSV file
+
+copy(
+select distinct cb.billingsystemmasterid, bsm.billingsystemname
+from "OPPE".anescompliancebilling cb
+join "OPPE".billingsystemmaster bsm
+on bsm.billingsystemmasterid = cb.billingsystemmasterid
+         )
+         to 'H:\WIP\TempWip\test.csv' DELIMITER ',' CSV HEADER;
+
+
+
+
+-- COPY results from CSV file
+
+COPY "PUBLIC".cptexclusions(cpt_code) 
+FROM 'H:\WIP\TempWip\ExclusionCPT.csv' DELIMITER ',' CSV HEADER;

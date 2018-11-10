@@ -1,0 +1,23 @@
+-- select distinct anesthesiatype, anesthesiatypedescription 
+-- from "OPPE".anescompliancebillingdetail
+-- where anesthesiatype in('Ep','gn','nb','rg','sp')
+
+select distinct cbd.anesthesiatype, 
+cbd.anesthesiatypedescription, 
+bsm.billingsystemname 
+from "OPPE".anescompliancebillingdetail as cbd
+inner join "OPPE".anescompliancebilling as cb
+on cb.anescompliancebillingid = cbd.anescompliancebillingid
+left join "OPPE".billingsystemmaster as bsm
+on bsm.billingsystemmasterid = cb.billingsystemmasterid
+
+where cbd.anesthesiatype ilike('ep')
+or cbd.anesthesiatype ilike('gn')
+or cbd.anesthesiatype ilike('nb')
+or cbd.anesthesiatype ilike('rg')
+or cbd.anesthesiatype ilike('sp')
+or cbd.anesthesiatype ilike('mc')
+and bsm.lineofbusinessid ='1'
+and bsm.billingsystemmasterid in('201','202','203','204','205','206','207','208','209','210','211','212')
+
+order by 1

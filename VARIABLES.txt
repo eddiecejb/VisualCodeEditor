@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION "OPPE".StartDate(
+	)
+    RETURNS date
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+
+declare StartDate date = '20180101';
+
+
+BEGIN
+
+return startdate;
+END;
+
+$BODY$;

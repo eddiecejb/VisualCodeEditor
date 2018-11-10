@@ -1,0 +1,14 @@
+select bsm.billingsystemname, count(distinct ab.encounternumber)
+as count
+
+from "OPPE".anescompliancebilling ab
+join "OPPE".anescompliancebillingdetail abd
+on ab.anescompliancebillingid = abd.anescompliancebillingid
+left join "OPPE".billingsystemmaster bsm
+on ab.billingsystemmasterid = bsm.billingsystemmasterid
+left join "OPPE".mdm_facility fac
+on ab.facilityid = fac.facilityid
+where cast(ab.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+group by  bsm.billingsystemname
+order by count(distinct ab.encounternumber) desc
+limit 100;

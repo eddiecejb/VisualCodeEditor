@@ -1,0 +1,54 @@
+
+-- GE Details
+
+select distinct cast(cb.dateofservice as date) as "Date", cb.encounternumber as "Encounter", cbd.doctorname as "Doctor"
+, cbd.doctornpi, fac.name as "Facility", fac.facilityid, fac.code,bsm.billingsystemname as "Billing System"
+,DATE_PART('month', cast(cb.dateofservice as date)) as "Month"
+,DATE_PART('year', cast(cb.dateofservice as date)) as "Year"
+
+from "OPPE".anescompliancebilling as cb
+join "OPPE".anescompliancebillingdetail as cbd
+on cbd.anescompliancebillingid = cb.anescompliancebillingid
+left join "OPPE".billingsystemmaster bsm
+on cb.billingsystemmasterid = bsm.billingsystemmasterid	
+-- left join "OPPE".clinicaloccurrence cc
+-- on cc.billingsystemmasterid = cb.billingsystemmasterid
+left join "OPPE".mdm_facility fac
+on cb.facilityid = fac.facilityid
+
+where cast(cb.dateofservice as date) >= '20180101' and cast(cb.dateofservice as date) <= '20180630'
+and cb.billingsystemmasterid = '203' 
+order by cast(cb.dateofservice as date);
+
+
+-- GE Count(cases)
+
+select distinct cast(cb.dateofservice as date) as "Date", count(distinct cb.encounternumber) as "Encounter", cbd.doctorname as "Doctor"
+, cbd.doctornpi, fac.name as "Facility", fac.facilityid, fac.code,bsm.billingsystemname as "Billing System"
+,DATE_PART('month', cast(cb.dateofservice as date)) as "Month"
+,DATE_PART('year', cast(cb.dateofservice as date)) as "Year"
+
+from "OPPE".anescompliancebilling as cb
+join "OPPE".anescompliancebillingdetail as cbd
+on cbd.anescompliancebillingid = cb.anescompliancebillingid
+left join "OPPE".billingsystemmaster bsm
+on cb.billingsystemmasterid = bsm.billingsystemmasterid	
+-- left join "OPPE".clinicaloccurrence cc
+-- on cc.billingsystemmasterid = cb.billingsystemmasterid
+left join "OPPE".mdm_facility fac
+on cb.facilityid = fac.facilityid
+
+where cast(cb.dateofservice as date) >= '20180101' and cast(cb.dateofservice as date) <= '20180630'
+and cb.billingsystemmasterid = '203' 
+
+						
+group by cast(cb.dateofservice as date),  cbd.doctorname
+, cbd.doctornpi, fac.name, fac.facilityid, fac.code, bsm.billingsystemname
+,DATE_PART('month', cast(cb.dateofservice as date))
+,DATE_PART('year', cast(cb.dateofservice as date))
+						
+order by cast(cb.dateofservice as date);
+
+
+-- GE Temperature Mgmt measure
+

@@ -1,0 +1,94 @@
+--All Combined
+
+DROP TABLE IF EXISTS TEMP CASCADE;
+
+create table TEMP(
+billingsystemmasterid int,
+billingsystemname varchar,
+encounternumber int	
+
+);
+
+-- Legacy
+INSERT INTO TEMP(billingsystemmasterid, billingsystemname, encounternumber)
+select cast(bsm.billingsystemmasterid as int), bsm.billingsystemname, count(distinct bml.encounternumber)
+
+	
+from "OPPE".billingmasterdataalllegacy bml
+left join "OPPE".billingsystemmaster bsm
+on bml.billingsystemmasterid = bsm.billingsystemmasterid
+where cast(bml.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by bsm.billingsystemname, bsm.billingsystemmasterid;
+
+
+--  Newcount 
+INSERT INTO TEMP(billingsystemmasterid, billingsystemname, encounternumber)	
+select cast(ab.billingsystemmasterid as int),bsm.billingsystemname, count(distinct ab.encounternumber)
+
+
+from "OPPE".anescompliancebilling ab
+left join "OPPE".billingsystemmaster bsm
+on ab.billingsystemmasterid = bsm.billingsystemmasterid
+--left join "OPPE".mdm_facility fac
+--on ab.facilityid = fac.facilityid
+where cast(ab.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by  bsm.billingsystemname, ab.billingsystemmasterid;
+
+
+select billingsystemmasterid as "Billing ID", billingsystemname as "Billing System Name", SUM(encounternumber) as Cases
+from TEMP
+group by billingsystemmasterid, billingsystemname
+order by SUM(encounternumber) desc;
+
+
+
+-- Broken out into three columns
+
+DROP TABLE IF EXISTS TEMP CASCADE;
+
+create table TEMP(
+billingsystemmasterid int,
+billingsystemname varchar,
+encounternumber int,
+legacycase int,
+newcase int
+
+);
+
+-- Legacy
+INSERT INTO TEMP(billingsystemmasterid, billingsystemname, encounternumber, legacycase, newcase)
+select cast(bsm.billingsystemmasterid as int), bsm.billingsystemname, count(distinct bml.encounternumber)
+,count(distinct bml.encounternumber), 0
+
+	
+from "OPPE".billingmasterdataalllegacy bml
+left join "OPPE".billingsystemmaster bsm
+on bml.billingsystemmasterid = bsm.billingsystemmasterid
+where cast(bml.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by bsm.billingsystemname, bsm.billingsystemmasterid;
+
+
+--  Newcount 
+INSERT INTO TEMP(billingsystemmasterid, billingsystemname, encounternumber, legacycase, newcase)	
+select cast(ab.billingsystemmasterid as int),bsm.billingsystemname, count(distinct ab.encounternumber)
+,0,count(distinct ab.encounternumber)
+
+
+from "OPPE".anescompliancebilling ab
+left join "OPPE".billingsystemmaster bsm
+on ab.billingsystemmasterid = bsm.billingsystemmasterid
+--left join "OPPE".mdm_facility fac
+--on ab.facilityid = fac.facilityid
+where cast(ab.dateofservice as date) >= cast(date_trunc('year', current_date) as date)  
+and bsm.lineofbusinessid = '1'
+group by  bsm.billingsystemname, ab.billingsystemmasterid;
+
+
+select billingsystemmasterid as "Billing ID", billingsystemname as "Billing System Name", SUM(encounternumber) as "Total Cases"
+,legacycase, newcase
+from TEMP
+group by billingsystemmasterid, billingsystemname,legacycase, newcase
+order by billingsystemname desc;

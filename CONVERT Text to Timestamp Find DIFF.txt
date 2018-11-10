@@ -1,0 +1,7 @@
+select cb.encounternumber, TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone as EndTime
+,	TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')::timestamp without time zone as StartTime																		   
+,date_part('hour', TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')-TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')) as "Hours"
+,date_part('minute', TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')-TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')) as "Minutes"																								 
+from "OPPE".anescompliancebilling cb
+where date_part('hour', TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')-TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')) >=1																	
+limit 1000;

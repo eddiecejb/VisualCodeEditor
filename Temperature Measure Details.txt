@@ -1,0 +1,76 @@
+
+
+--Temp Measure Details GE/POP
+
+
+select distinct cast(cb.dateofservice as date) as "Date", cb.encounternumber as "Encounter", cbd.doctorname as "Doctor"
+, cbd.doctornpi as "Doctor NPI", fac.name as "Facility", fac.facilityid as "Facility ID", fac.code as "Facility Code"
+,bsm.billingsystemname as "Billing System"
+,DATE_PART('month', cast(cb.dateofservice as date)) as "Month"
+,DATE_PART('year', cast(cb.dateofservice as date)) as "Year"
+,bsm.billingsystemmasterid as "Billing Sys ID"
+--,abg.configcode as "Config Code" expands records
+--,cbd.cptcode as "Procedure Code" expands records
+,(case 
+when cc.temperature_eval = 'True'
+and cc.temperature_fahrenheit >= '95.9' 
+and cc.intentional_hypothermia ilike('false')
+and abg.configcode IN('E','G','B','S','M')
+and cbd.cptcode NOT IN ('99140')
+
+and cbd.cptcode NOT IN ('59510'	,
+'5951022','5951080','59514','5951480','59515','59618','5961822','59620','59622','59812','59812SU','59820'
+,'59820AVMD','59820SU','59821','59821SU','59830','59840','59840SU','59841','59841SU','59850','59850SU','59851'
+,'59852','59855','59855SU','59856','59857','59866','59866SU','59870','59871','59897','59898','59899','59525') --OB Exclusions
+
+and TO_NUMBER(cbd.cptcode,'99999') NOT BETWEEN 33010 and 37799 --cardiac cases
+  
+and date_part('hour', TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')-TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')) >=1
+  
+then 1  else 0
+END
+)as "Numerator Temp"
+			  
+			  
+,(case 
+when cc.temperature_eval = 'True'
+and cc.temperature_fahrenheit >= '95.9' 
+and cc.intentional_hypothermia ilike('false')
+and abg.configcode IN('E','G','B','S','M')
+and cbd.cptcode NOT IN ('99140')
+
+and cbd.cptcode NOT IN ('59510'	,
+'5951022','5951080','59514','5951480','59515','59618','5961822','59620','59622','59812','59812SU','59820'
+,'59820AVMD','59820SU','59821','59821SU','59830','59840','59840SU','59841','59841SU','59850','59850SU','59851'
+,'59852','59855','59855SU','59856','59857','59866','59866SU','59870','59871','59897','59898','59899','59525') --OB Exclusions
+
+and TO_NUMBER(cbd.cptcode,'99999') NOT BETWEEN 33010 and 37799 --cardiac cases
+
+and date_part('hour', TO_TIMESTAMP(cb.anesthesiaroomendtime , 'YYYY-MM-DD HH24:MI:SS')-TO_TIMESTAMP(cb.anesthesiaroomstarttime , 'YYYY-MM-DD HH24:MI:SS')) >=1
+  
+
+then 1  else 0
+END
+)as "Denominator Temp"
+
+
+			  
+-- into table ED1			  
+
+from "OPPE".anescompliancebilling as cb
+join "OPPE".anescompliancebillingdetail as cbd
+on cbd.anescompliancebillingid = cb.anescompliancebillingid
+left join "OPPE".anescomplianceclinical cc
+on cb.anescompliancebillingid = cc.anescompliancebillingid
+left join "OPPE".billingsystemmaster bsm
+on cb.billingsystemmasterid = bsm.billingsystemmasterid	
+left join "OPPE".mdm_facility fac
+on cb.facilityid = fac.facilityid
+left join "OPPE".anesabgconfig abg
+on abg.billingsystemmasterid = cb.billingsystemmasterid
+
+where cast(cb.dateofservice as date) >= '20180101' and cast(cb.dateofservice as date) <= '20180630'
+and cb.billingsystemmasterid = '203' 
+--and cb.billingsystemmasterid = '206'
+
+order by cast(cb.dateofservice as date);

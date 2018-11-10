@@ -1,0 +1,47 @@
+--DATE FORMULAS
+
+
+select cast(date_trunc('month', current_date) as date) as FirstOfMonth
+select cast(date_trunc('month', current_date)+'1 month' as date) as FirstOfNextMonth
+select cast(date_trunc('year', current_date) as date) as FirstOfYear
+select cast(date_trunc('year', current_date)+'1 year' as date) as FirstOfNextYear
+select cast(date_trunc('year', current_date) - interval '1 year' as date) as FirstOfLastYear
+
+
+select cast(date_trunc('month', current_date)+'1month'::interval-'1day'::interval as date) as LastDayOfMonth
+
+select cast(DATE_TRUNC('month', now()) + INTERVAL '1month - 1day' as date) as EndOfMonth
+
+select cast(current_date + interval '1 day' as date) as Tomorrow
+select cast(current_date - interval '1 day' as date) as Yesterday
+select cast(current_date + interval '1 year' as date) as NextYear
+select cast(current_date - interval '1 year' as date) as last year
+select cast(date_trunc('year', cast(dateofservice as date)) as date) as  FirstOfYear
+select cast(date_trunc('month', cast(dateofservice as date)) as date) as  FirstOfMonth
+select cast(date_trunc('year', current_date - interval '1 year') as date) as "2 years YTD"
+select cast(date_trunc('year', current_date - interval '2 year') as date) as "3 years YTD"
+select cast(date_trunc('year', current_date - interval '3 year') as date) as "4 years YTD"
+select cast(date_trunc('year', current_date - interval '4 year') as date) as "5 years YTD"
+				 
+ select date_part('year', cast(date_trunc('year', cast(dateofservice as date)) as date)) as  YearOnly,
+ select date_part('month', cast(date_trunc('month', cast(dateofservice as date)) as date)) as  MonthOnly
+
+select EXTRACT(YEAR from NOW()) as Year
+select EXTRACT(QUARTER from NOW()) as Quarter
+select EXTRACT(MONTH from NOW()) as Month
+select EXTRACT(WEEK from NOW()) as Week
+
+
+select EXTRACT(DOY from NOW()) as "Day of Year"
+select EXTRACT(DAY from NOW()) as "Day of Month"
+select EXTRACT(DOW from NOW()) as "Day of Week"
+
+select DATE_PART('day', NOW()) as "Day Of Month"
+select DATE_PART('day', date '20181016') as "Day Of Month"
+select DATE_PART('month', date '20181016') as Month
+select DATE_PART('year', date '20181016') as Year
+select 'Q' || DATE_PART('QUARTER', CAST(DATEOFSERVICE AS DATE)) as Quarter
+
+
+select date_part('hour', timestamp '2014-04-25 08:44:21') as Hour
+select date_part('minute', timestamp '2014-04-25 08:44:21') as Minute

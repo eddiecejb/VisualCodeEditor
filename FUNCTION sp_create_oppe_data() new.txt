@@ -1,0 +1,60 @@
+-- FUNCTION: "OPPE".sp_create_oppe_data()
+
+-- DROP FUNCTION "OPPE".sp_create_oppe_data();
+
+CREATE OR REPLACE FUNCTION "OPPE".sp_create_oppe_data(
+	)
+    RETURNS void
+    LANGUAGE 'plpgsql'
+
+    COST 100
+    VOLATILE 
+AS $BODY$
+
+BEGIN
+
+	DROP TABLE IF EXISTS "OPPE".oppe_raw_data;
+
+	CREATE TABLE "OPPE".oppe_raw_data
+	(
+		facilitycodeedw text COLLATE pg_catalog."default",
+		doctornpi text COLLATE pg_catalog."default",
+		dateofservice date,
+		encounternumber text COLLATE pg_catalog."default",
+		anesthesia_timeout text COLLATE pg_catalog."default",
+		surgery_timeout text COLLATE pg_catalog."default",
+		temperature_eval text COLLATE pg_catalog."default",
+		airway_assessed text COLLATE pg_catalog."default"
+	);
+
+	INSERT INTO "OPPE".oppe_raw_data
+	SELECT FacilityCodeEDW,DoctorNPI,CAST(DateOfService as date),ACB.EncounterNumber,Anesthesia_Timeout, Surgery_Timeout,Temperature_Eval,Airway_Assessed
+	FROM "OPPE".AnesComplianceClinical ACC
+	LEFT JOIN "OPPE".AnesComplianceBilling ACB
+		ON ACC.AnesComplianceBillingID =ACB.AnesComplianceBillingID
+	LEFT JOIN "OPPE".AnesComplianceBillingDetail ACBD
+		ON ACB.AnesComplianceBillingID = ACBD.AnesComplianceBillingID;		
+
+	END;
+
+	
+
+$BODY$;
+
+ALTER FUNCTION "OPPE".sp_create_oppe_data()
+    OWNER TO "chad.williams";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "Rebekah.Dodson";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "Sunil.Pamulapati";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "Naga.Akula";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "edward.english";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO PUBLIC;
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "Swapna.Shagabandi";
+
+GRANT EXECUTE ON FUNCTION "OPPE".sp_create_oppe_data() TO "chad.williams";
+

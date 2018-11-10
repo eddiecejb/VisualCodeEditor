@@ -1,0 +1,11 @@
+-- There are 12 billing systems in the billingsystemmaster table for Anes
+select distinct billingsystemmasterid, billingsystemname,description
+from "OPPE".billingsystemmaster
+where lineofbusinessid ='1'
+
+
+-- There are 9 distinct Anes billing systems in the new tables
+select distinct cb.billingsystemmasterid, bsm.billingsystemname
+from "OPPE".anescompliancebilling cb
+join "OPPE".billingsystemmaster bsm
+on bsm.billingsystemmasterid = cb.billingsystemmasterid
